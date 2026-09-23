@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institutional Work Order Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="h-full text-slate-800 antialiased font-sans flex flex-col min-h-screen bg-slate-100">
+
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-700/50">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-700 to-indigo-800 p-6 text-white text-center relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/20 shadow-inner">
+                    <i class="fa-solid fa-square-poll-vertical text-2xl text-blue-200"></i>
+                </div>
+                <h2 class="text-xl font-extrabold tracking-tight">Institutional Work Order Portal</h2>
+                <p class="text-xs text-blue-200 mt-1">Multi-Level Lab & Workshop Operations System</p>
+            </div>
+
+            <!-- Login Form -->
+            <form onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username / User ID *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="loginUsername" required placeholder="e.g. Staff A, Faculty AA, XYZ, Staff a" class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 bg-slate-50 focus:bg-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="password" id="loginPassword" required placeholder="Enter password" class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 bg-slate-50 focus:bg-white">
+                    </div>
+                </div>
+
+                <!-- Quick Preset Selector for Easy Testing -->
+                <div class="pt-2 border-t border-slate-100">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5 flex justify-between items-center">
+                        <span>⚡ Quick Demo Presets</span>
+                        <button type="button" onclick="openModal('directoryModal')" class="text-blue-600 hover:underline text-[10px] font-semibold">View All Credentials</button>
+                    </label>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <button type="button" onclick="fillPreset('Staff A', 'PassA!123')" class="p-2 border border-slate-200 rounded-lg bg-slate-50 hover:bg-blue-50 text-left transition-colors">
+                            <span class="font-bold text-slate-800 block">👤 Staff A</span>
+                            <span class="text-[10px] text-slate-500">Lab 1 (Reports to AA)</span>
+                        </button>
+                        <button type="button" onclick="fillPreset('Faculty AA', 'FacultyAA!2026')" class="p-2 border border-slate-200 rounded-lg bg-slate-50 hover:bg-purple-50 text-left transition-colors">
+                            <span class="font-bold text-purple-800 block">🎓 Faculty AA</span>
+                            <span class="text-[10px] text-slate-500">Approver for Lab 1</span>
+                        </button>
+                        <button type="button" onclick="fillPreset('XYZ', 'WorkshopXYZ!2026')" class="p-2 border border-slate-200 rounded-lg bg-slate-50 hover:bg-emerald-50 text-left transition-colors">
+                            <span class="font-bold text-emerald-800 block">🔧 Head XYZ</span>
+                            <span class="text-[10px] text-slate-500">Workshop Supervisor</span>
+                        </button>
+                        <button type="button" onclick="fillPreset('Staff a', 'WShop_a!123')" class="p-2 border border-slate-200 rounded-lg bg-slate-50 hover:bg-amber-50 text-left transition-colors">
+                            <span class="font-bold text-amber-800 block">⚙️ Staff a</span>
+                            <span class="text-[10px] text-slate-500">Workshop Specialist</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loginErrorMessage" class="hidden p-2.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation text-rose-500"></i>
+                    <span id="loginErrorText">Invalid username or password.</span>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Sign In to Portal
+                </button>
+            </form>
+
+            <div class="p-3 bg-slate-50 border-t border-slate-200 text-center">
+                <button onclick="openModal('directoryModal')" class="text-xs font-semibold text-slate-600 hover:text-blue-600 flex items-center justify-center gap-1.5 mx-auto">
+                    <i class="fa-solid fa-address-book text-blue-500"></i> Open User Directory & Password Matrix
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer" class="hidden flex-1 flex flex-col">
+        <!-- Top Navigation Bar -->
+        <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-xl border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo & Title -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/30">
+                            <i class="fa-solid fa-industry text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-extrabold text-base tracking-tight text-white flex items-center gap-2">
+                                FabOrder <span class="text-xs bg-blue-500/30 text-blue-300 border border-blue-400/30 px-2 py-0.5 rounded-full font-medium">Institutional Hub</span>
+                            </h1>
+                            <p class="text-[11px] text-slate-400">Work Order Portal with Strict Hierarchy</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Controls: User Profile, Directory Modal, Download HTML Button, Logout -->
+                    <div class="flex items-center space-x-2.5">
+                        <!-- DIRECT HTML DOWNLOAD BUTTON -->
+                        <button onclick="downloadCurrentHtml()" title="Download full source HTML code file" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors border border-emerald-500">
+                            <i class="fa-solid fa-download"></i>
+                            <span class="hidden md:inline">Download HTML File</span>
+                        </button>
+
+                        <!-- User Directory Modal Button -->
+                        <button onclick="openModal('directoryModal')" title="View user credentials directory" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-users text-blue-400"></i>
+                            <span class="hidden sm:inline">User Directory</span>
+                        </button>
+
+                        <!-- Logged User Badge -->
+                        <div id="currentUserBadge" class="bg-slate-800 border border-slate-700/80 rounded-lg px-3 py-1.5 flex items-center space-x-2">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <!-- Logout -->
+                        <button onclick="handleLogout()" title="Log Out" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors text-xs">
+                            <i class="fa-solid fa-power-off text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Scope Information Bar -->
+            <div id="roleScopeBanner" class="bg-blue-950/70 border-t border-blue-900/60 px-4 py-1.5 text-xs text-center text-blue-200 font-medium">
+                <!-- Dynamically populated -->
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+            <!-- KPI Metric Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                
+                <!-- KPI 1: Scope Total Orders -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Visible Orders</p>
+                            <h3 id="kpiTotal" class="text-2xl font-black text-slate-800 mt-0.5">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                            <i class="fa-solid fa-list-check text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2"><i class="fa-solid fa-filter mr-1"></i>Filtered to your role scope</p>
+                </div>
+
+                <!-- KPI 2: Pending Faculty Approval -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Pending Approval</p>
+                            <h3 id="kpiPending" class="text-2xl font-black text-amber-600 mt-0.5">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                            <i class="fa-solid fa-hourglass-half text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-amber-600/80 mt-2"><i class="fa-solid fa-clock mr-1"></i>Awaiting Faculty Sign-off</p>
+                </div>
+
+                <!-- KPI 3: In Workshop -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Active Workshop</p>
+                            <h3 id="kpiInProgress" class="text-2xl font-black text-blue-600 mt-0.5">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                            <i class="fa-solid fa-gears text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-blue-600/80 mt-2"><i class="fa-solid fa-spin fa-gear mr-1"></i>Assigned or In Progress</p>
+                </div>
+
+                <!-- KPI 4: Completed -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Completed</p>
+                            <h3 id="kpiCompleted" class="text-2xl font-black text-emerald-600 mt-0.5">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                            <i class="fa-solid fa-circle-check text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-emerald-600/80 mt-2"><i class="fa-solid fa-check mr-1"></i>Finished & Verified</p>
+                </div>
+
+                <!-- KPI 5: Service Satisfaction KPI Widget -->
+                <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-4 rounded-xl shadow-md border border-indigo-800 flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <p class="text-[11px] font-bold text-indigo-300 uppercase tracking-wider">Satisfaction KPI</p>
+                            <span id="kpiSatisfactionScore" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">4.8 / 5.0</span>
+                        </div>
+                        <div class="mt-2 flex items-baseline space-x-2">
+                            <span id="kpiAvgRatingStars" class="text-lg font-black text-amber-400 tracking-wider">
+                                <!-- Dynamic Stars -->
+                            </span>
+                            <span id="kpiTotalFeedbackCount" class="text-[11px] text-slate-300 font-medium">(0 Ratings)</span>
+                        </div>
+                    </div>
+                    <!-- Breakdown meters -->
+                    <div class="mt-2 space-y-1 text-[10px]">
+                        <div class="flex items-center justify-between text-slate-300">
+                            <span>😍 Highly Satisfied</span>
+                            <span id="pctHighlySatisfied" class="font-bold text-slate-200">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
+                            <div id="barHighlySatisfied" class="bg-emerald-400 h-1 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-slate-300">
+                            <span>🙂 Satisfied</span>
+                            <span id="pctSatisfied" class="font-bold text-slate-200">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
+                            <div id="barSatisfied" class="bg-blue-400 h-1 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Search Input -->
+                <div class="relative w-full md:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Search WO ID, title, lab, staff, tech..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all">
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    <!-- Status Filter -->
+                    <select id="statusFilter" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-xs rounded-lg px-3 py-2 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="ALL">All Statuses</option>
+                        <option value="Pending Approval">Pending Approval</option>
+                        <option value="Approved - Pending Workshop Assignment">Approved - Pending Assignment</option>
+                        <option value="Assigned to Workshop">Assigned to Workshop</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+
+                    <!-- Priority Filter -->
+                    <select id="priorityFilter" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-xs rounded-lg px-3 py-2 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="ALL">All Priorities</option>
+                        <option value="Urgent">🔥 Urgent Priority</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Routine">Routine</option>
+                    </select>
+
+                    <!-- Submit Button (Visible to Lab Staff) -->
+                    <button id="btnNewWorkOrder" onclick="openCreateWoModal()" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow transition-all flex items-center space-x-1.5">
+                        <i class="fa-solid fa-plus text-sm"></i>
+                        <span>New Work Order</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 py-3.5 border-b border-slate-200 bg-slate-50/70 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-blue-600"></i> Work Orders Registry
+                    </h2>
+                    <span id="filteredCountBadge" class="text-xs bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full font-bold">Showing 0 orders</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100/80 border-b border-slate-200 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
+                                <th class="py-3 px-4">WO ID & Date</th>
+                                <th class="py-3 px-4">Title & Category</th>
+                                <th class="py-3 px-4">Origin (Lab / Staff)</th>
+                                <th class="py-3 px-4">Approval Faculty</th>
+                                <th class="py-3 px-4">Assigned Tech</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workOrderTableBody" class="divide-y divide-slate-100 text-xs">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden p-12 text-center">
+                    <div class="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 text-xl mb-2">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-700">No Work Orders Found</h3>
+                    <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1">No orders match your filter criteria or role permission scope.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="createWoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+                <div class="flex items-center space-x-2">
+                    <div class="p-2 bg-blue-600 rounded-lg text-white">
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm">Submit New Work Order Request</h3>
+                        <p id="createModalSubText" class="text-[11px] text-slate-400">Requesting from Lab Staff Account</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('createWoModal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Form -->
+            <form id="createWoForm" onsubmit="handleCreateWoSubmit(event)" class="p-6 overflow-y-auto space-y-4 text-xs">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Work Title *</label>
+                        <input type="text" id="formTitle" required placeholder="e.g. CNC Shaft Machining for Test Rig" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Workshop Category *</label>
+                        <select id="formCategory" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white">
+                            <option value="Mechanical Machining">Mechanical Machining & Lathe</option>
+                            <option value="Welding & Fabrication">Welding & Metal Fabrication</option>
+                            <option value="3D Printing & Prototyping">3D Printing & Rapid Prototyping</option>
+                            <option value="Electrical & Electronics">Electrical & Electronics Work</option>
+                            <option value="Carpentry & Structural">Carpentry & Structural Woodwork</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Priority Level -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Priority Tag *</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="border border-slate-200 rounded-lg p-2 flex items-center justify-center space-x-2 cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
+                            <input type="radio" name="formPriority" value="Routine" checked class="text-blue-600">
+                            <span class="font-medium text-slate-700">Routine</span>
+                        </label>
+                        <label class="border border-slate-200 rounded-lg p-2 flex items-center justify-center space-x-2 cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
+                            <input type="radio" name="formPriority" value="Normal" class="text-blue-600">
+                            <span class="font-medium text-slate-700">Normal</span>
+                        </label>
+                        <label class="border border-red-200 rounded-lg p-2 flex items-center justify-center space-x-2 cursor-pointer hover:bg-red-50 has-[:checked]:border-red-600 has-[:checked]:bg-red-50/60">
+                            <input type="radio" name="formPriority" value="Urgent" class="text-red-600">
+                            <span class="font-bold text-red-700 flex items-center gap-1"><i class="fa-solid fa-fire text-red-500"></i> Urgent</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Detailed Technical Specifications & Issue *</label>
+                    <textarea id="formDescription" rows="3" required placeholder="Provide clear technical details, tolerances, material requirements, or issue description..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+                </div>
+
+                <!-- Material Requirements List -->
+                <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-boxes-stacked text-blue-600"></i> Material Details Required
+                        </label>
+                        <button type="button" onclick="addMaterialInputRow()" class="text-[11px] bg-white text-blue-600 hover:bg-blue-50 border border-blue-200 font-bold px-2 py-1 rounded">
+                            + Add Material Item
+                        </button>
+                    </div>
+                    <div id="materialsContainer" class="space-y-2">
+                        <div class="flex gap-2 items-center material-row">
+                            <input type="text" placeholder="Item Name (e.g. Stainless Rod 20mm)" class="mat-item flex-1 px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-600">
+                            <input type="text" placeholder="Qty (e.g. 2 meters)" class="mat-qty w-32 px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-600">
+                            <button type="button" onclick="removeMaterialRow(this)" class="text-slate-400 hover:text-rose-500 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Attachment Mock -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Drawings / CAD Attachment</label>
+                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-3 text-center bg-slate-50 hover:border-blue-400 transition-colors">
+                        <i class="fa-solid fa-cloud-arrow-up text-xl text-slate-400 mb-1"></i>
+                        <p class="font-medium text-slate-600">Select file attachment (Drawing/Blueprint)</p>
+                        <input type="file" id="formAttachmentInput" class="hidden" onchange="handleMockFileSelect(event)">
+                        <button type="button" onclick="document.getElementById('formAttachmentInput').click()" class="mt-1 text-xs text-blue-600 font-bold underline">Browse Computer</button>
+                        <div id="selectedFileName" class="mt-1 font-bold text-blue-600 hidden"></div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-200 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('createWoModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-sm">Submit Work Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="detailsWoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div id="detailHeaderBar" class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+                <!-- Dynamically populated -->
+            </div>
+
+            <div id="detailBodyContent" class="p-6 overflow-y-auto space-y-5 text-xs">
+                <!-- Dynamically populated view & action boxes -->
+            </div>
+
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                <span class="text-[11px] text-slate-400"><i class="fa-solid fa-shield-halved mr-1"></i> Audit Trail Verified</span>
+                <button onclick="closeModal('detailsWoModal')" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-700">Close Window</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="directoryModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-address-book text-blue-400 text-lg"></i>
+                    <h3 class="font-bold text-sm">Organizational Credentials & Hierarchy Matrix</h3>
+                </div>
+                <button onclick="closeModal('directoryModal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 text-xs">
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl text-blue-900 leading-relaxed">
+                    <p class="font-bold mb-0.5"><i class="fa-solid fa-circle-info mr-1"></i> Exact Hierarchy Applied:</p>
+                    <p>• <strong>Lab Staff A–E (Lab 1)</strong> report to <strong>Faculty AA</strong> | <strong>F–I (Lab 2)</strong> report to <strong>Faculty AB</strong> | <strong>J–N (Lab 3)</strong> report to <strong>Faculty AC</strong></p>
+                    <p>• <strong>Staff O–R (Lab 4)</strong> report to <strong>Faculty AD</strong> | <strong>S–W (Lab 5)</strong> report to <strong>Faculty AE</strong> | <strong>X–Z (Lab 5)</strong> report to <strong>Faculty AF</strong></p>
+                    <p>• <strong>Workshop Staff a–f</strong> all report to <strong>Workshop Supervisor XYZ</strong>.</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse border border-slate-200">
+                        <thead>
+                            <tr class="bg-slate-100 text-[10px] font-extrabold uppercase text-slate-600">
+                                <th class="p-2 border">Role Type</th>
+                                <th class="p-2 border">Username(s)</th>
+                                <th class="p-2 border">Lab Assignment</th>
+                                <th class="p-2 border">Reports To / Role</th>
+                                <th class="p-2 border">Password</th>
+                                <th class="p-2 border text-center">Quick Login</th>
+                            </tr>
+                        </thead>
+                        <tbody id="directoryTableBody" class="divide-y divide-slate-200">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 text-right">
+                <button onclick="closeModal('directoryModal')" class="px-4 py-1.5 bg-slate-800 text-white rounded font-bold">Close Directory</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ALL_USERS = [
+            // Lab Staff A to E -> Lab 1 -> Faculty AA
+            ...['A','B','C','D','E'].map(s => ({ id: `Staff ${s}`, name: `Staff ${s}`, role: 'staff', lab: 'Lab 1', reportsTo: 'Faculty AA', password: `Pass${s}!123` })),
+            // Lab Staff F to I -> Lab 2 -> Faculty AB
+            ...['F','G','H','I'].map(s => ({ id: `Staff ${s}`, name: `Staff ${s}`, role: 'staff', lab: 'Lab 2', reportsTo: 'Faculty AB', password: `Pass${s}!123` })),
+            // Lab Staff J to N -> Lab 3 -> Faculty AC
+            ...['J','K','L','M','N'].map(s => ({ id: `Staff ${s}`, name: `Staff ${s}`, role: 'staff', lab: 'Lab 3', reportsTo: 'Faculty AC', password: `Pass${s}!123` })),
+            // Lab Staff O to R -> Lab 4 -> Faculty AD
+            ...['O','P','Q','R'].map(s => ({ id: `Staff ${s}`, name: `Staff ${s}`, role: 'staff', lab: 'Lab 4', reportsTo: 'Faculty AD', password: `Pass${s}!123` })),
+            // Lab Staff S to W -> Lab 5 -> Faculty AE
+            ...['S','T','U','V','W'].map(s => ({ id: `Staff ${s}`, name: `Staff ${s}`, role: 'staff', lab: 'Lab 5', reportsTo: 'Faculty AE', password: `Pass${s}!123` })),
+            // Lab Staff X to Z -> Lab 5 -> Faculty AF
+            ...['X','Y','Z'].map(s => ({ id: `Staff ${s}`, name: `Staff ${s}`, role: 'staff', lab: 'Lab 5', reportsTo: 'Faculty AF', password: `Pass${s}!123` })),
+
+            // Faculty In-Charge AA to AF
+            { id: 'Faculty AA', name: 'Faculty AA', role: 'faculty', lab: 'Lab 1', reportsTo: 'Head', password: 'FacultyAA!2026' },
+            { id: 'Faculty AB', name: 'Faculty AB', role: 'faculty', lab: 'Lab 2', reportsTo: 'Head', password: 'FacultyAB!2026' },
+            { id: 'Faculty AC', name: 'Faculty AC', role: 'faculty', lab: 'Lab 3', reportsTo: 'Head', password: 'FacultyAC!2026' },
+            { id: 'Faculty AD', name: 'Faculty AD', role: 'faculty', lab: 'Lab 4', reportsTo: 'Head', password: 'FacultyAD!2026' },
+            { id: 'Faculty AE', name: 'Faculty AE', role: 'faculty', lab: 'Lab 5', reportsTo: 'Head', password: 'FacultyAE!2026' },
+            { id: 'Faculty AF', name: 'Faculty AF', role: 'faculty', lab: 'Lab 5', reportsTo: 'Head', password: 'FacultyAF!2026' },
+
+            // Workshop Team
+            { id: 'XYZ', name: 'XYZ (Workshop Head)', role: 'workshop_head', lab: 'Central Workshop', reportsTo: 'Institution', password: 'WorkshopXYZ!2026' },
+            ...['a','b','c','d','e','f'].map(w => ({ id: `Staff ${w}`, name: `Staff ${w}`, role: 'workshop_staff', lab: 'Central Workshop', reportsTo: 'XYZ', password: `WShop_${w}!123` }))
+        ];
+
+        const DEFAULT_ORDERS = [
+            {
+                id: "WO-2026-001",
+                title: "Lathe Shaft Machining for Aerodynamics Test Rig",
+                category: "Mechanical Machining",
+                lab: "Lab 1",
+                requesterId: "Staff A",
+                facultyId: "Faculty AA",
+                priority: "Urgent",
+                status: "Completed",
+                dateCreated: "2026-09-18 09:30",
+                description: "Fabricate precision stainless steel shaft adapter with tolerance < 0.02mm for turbine testing.",
+                materials: [{ item: "Stainless Steel Rod 30mm", qty: "1.5 meters" }],
+                attachments: [{ name: "shaft_blueprint_v1.pdf", size: "1.4 MB" }],
+                facultyApproval: { approvedBy: "Faculty AA", date: "2026-09-18 10:30", comments: "Approved for Aerodynamics grant research." },
+                assignment: { assignedBy: "XYZ", assignedTo: "Staff a", date: "2026-09-18 11:00", notes: "Use Precision Lathe #2. Ensure surface finish Ra 0.8." },
+                completion: { completedBy: "Staff a", date: "2026-09-20 16:00", notes: "Machining completed and dynamic balance checked." },
+                feedback: { rating: "Highly Satisfied", score: 5, comments: "Outstanding precision! Perfectly fit the test setup.", date: "2026-09-21 09:00" },
+                history: [
+                    { timestamp: "2026-09-18 09:30", action: "Submitted", actor: "Staff A", details: "Work order created." },
+                    { timestamp: "2026-09-18 10:30", action: "Faculty Approved", actor: "Faculty AA", details: "Approved for research." },
+                    { timestamp: "2026-09-18 11:00", action: "Assigned to Workshop", actor: "XYZ", details: "Assigned to Staff a." },
+                    { timestamp: "2026-09-20 16:00", action: "Work Completed", actor: "Staff a", details: "Finished machining." },
+                    { timestamp: "2026-09-21 09:00", action: "Feedback Provided", actor: "Staff A", details: "Rating: Highly Satisfied (5/5)" }
+                ]
+            },
+            {
+                id: "WO-2026-002",
+                title: "TIG Welding Frame for Capstone Drone Mount",
+                category: "Welding & Fabrication",
+                lab: "Lab 2",
+                requesterId: "Staff F",
+                facultyId: "Faculty AB",
+                priority: "Normal",
+                status: "Assigned to Workshop",
+                dateCreated: "2026-09-21 14:00",
+                description: "Welding structural aluminum box frame for multi-rotor testing rig.",
+                materials: [{ item: "Aluminum Square Tube 25x25mm", qty: "3 meters" }],
+                attachments: [{ name: "drone_frame.dxf", size: "820 KB" }],
+                facultyApproval: { approvedBy: "Faculty AB", date: "2026-09-21 15:00", comments: "Approved student project support." },
+                assignment: { assignedBy: "XYZ", assignedTo: "Staff b", date: "2026-09-22 09:30", notes: "Assigned to welder Staff b. Ensure clean TIG joints." },
+                completion: null,
+                feedback: null,
+                history: [
+                    { timestamp: "2026-09-21 14:00", action: "Submitted", actor: "Staff F", details: "Work order created." },
+                    { timestamp: "2026-09-21 15:00", action: "Faculty Approved", actor: "Faculty AB", details: "Approved." },
+                    { timestamp: "2026-09-22 09:30", action: "Assigned to Workshop", actor: "XYZ", details: "Assigned to Staff b." }
+                ]
+            },
+            {
+                id: "WO-2026-003",
+                title: "Sensor Casing PETG 3D Printing",
+                category: "3D Printing & Prototyping",
+                lab: "Lab 3",
+                requesterId: "Staff J",
+                facultyId: "Faculty AC",
+                priority: "Routine",
+                status: "Pending Approval",
+                dateCreated: "2026-09-22 11:15",
+                description: "3D print waterproof enclosure box for outdoor weather monitoring node.",
+                materials: [{ item: "PETG Black Filament", qty: "1 Spool" }],
+                attachments: [{ name: "sensor_box.stl", size: "3.2 MB" }],
+                facultyApproval: null,
+                assignment: null,
+                completion: null,
+                feedback: null,
+                history: [
+                    { timestamp: "2026-09-22 11:15", action: "Submitted", actor: "Staff J", details: "Awaiting approval from Faculty AC." }
+                ]
+            }
+        ];
+
+        // Global State
+        let currentUser = null;
+        let workOrders = [];
+        let selectedMockFile = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadOrdersFromStorage();
+            renderDirectoryTable();
+            checkAutoLogin();
+        });
+
+        function loadOrdersFromStorage() {
+            const saved = localStorage.getItem('fab_work_orders_v2');
+            if (saved) {
+                try { workOrders = JSON.parse(saved); } catch (e) { workOrders = [...DEFAULT_ORDERS]; }
+            } else {
+                workOrders = [...DEFAULT_ORDERS];
+                saveOrdersToStorage();
+            }
+        }
+
+        function saveOrdersToStorage() {
+            localStorage.setItem('fab_work_orders_v2', JSON.stringify(workOrders));
+        }
+
+        function fillPreset(username, password) {
+            document.getElementById('loginUsername').value = username;
+            document.getElementById('loginPassword').value = password;
+            document.getElementById('loginErrorMessage').classList.add('hidden');
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const un = document.getElementById('loginUsername').value.trim();
+            const pw = document.getElementById('loginPassword').value.trim();
+
+            const found = ALL_USERS.find(u => u.id.toLowerCase() === un.toLowerCase() && u.password === pw);
+
+            if (found) {
+                currentUser = found;
+                localStorage.setItem('fab_logged_user', currentUser.id);
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                document.getElementById('loginErrorMessage').classList.add('hidden');
+                renderUserBadge();
+                renderDashboard();
+                showToast(`Welcome back, ${currentUser.name}!`);
+            } else {
+                const err = document.getElementById('loginErrorMessage');
+                document.getElementById('loginErrorText').textContent = "Invalid User ID or Password. Click 'View All Credentials' for exact logins.";
+                err.classList.remove('hidden');
+            }
+        }
+
+        function checkAutoLogin() {
+            const savedUser = localStorage.getItem('fab_logged_user');
+            if (savedUser) {
+                const found = ALL_USERS.find(u => u.id === savedUser);
+                if (found) {
+                    currentUser = found;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('appContainer').classList.remove('hidden');
+                    renderUserBadge();
+                    renderDashboard();
+                    return;
+                }
+            }
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('fab_logged_user');
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            showToast("Logged out successfully.");
+        }
+
+        function renderUserBadge() {
+            const badge = document.getElementById('currentUserBadge');
+            const scopeBanner = document.getElementById('roleScopeBanner');
+
+            let roleTag = '';
+            if (currentUser.role === 'staff') roleTag = '👤 Lab Staff';
+            else if (currentUser.role === 'faculty') roleTag = '🎓 Faculty In-Charge';
+            else if (currentUser.role === 'workshop_head') roleTag = '🔧 Workshop Head';
+            else if (currentUser.role === 'workshop_staff') roleTag = '⚙️ Workshop Specialist';
+
+            badge.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white">
+                    ${currentUser.id.slice(-1).toUpperCase()}
+                </div>
+                <div class="text-xs">
+                    <div class="font-extrabold text-white leading-tight">${currentUser.name}</div>
+                    <div class="text-[10px] text-blue-300">${roleTag} (${currentUser.lab})</div>
+                </div>
+            `;
+
+            // Scope Text Banner & New Order Button Visibility
+            const btnNew = document.getElementById('btnNewWorkOrder');
+            if (currentUser.role === 'staff') {
+                btnNew.classList.remove('hidden');
+                scopeBanner.innerHTML = `<i class="fa-solid fa-circle-info mr-1"></i> Logged in as <strong>${currentUser.name}</strong> (${currentUser.lab}). Submissions will report to <strong>${currentUser.reportsTo}</strong>.`;
+            } else if (currentUser.role === 'faculty') {
+                btnNew.classList.add('hidden');
+                scopeBanner.innerHTML = `<i class="fa-solid fa-graduation-cap mr-1"></i> Logged in as <strong>${currentUser.name}</strong> (${currentUser.lab}). Showing orders submitted by your assigned Lab Staff.`;
+            } else if (currentUser.role === 'workshop_head') {
+                btnNew.classList.add('hidden');
+                scopeBanner.innerHTML = `<i class="fa-solid fa-gears mr-1"></i> Logged in as <strong>Workshop Head XYZ</strong>. Overseeing all Faculty-Approved work orders & workshop assignments.`;
+            } else if (currentUser.role === 'workshop_staff') {
+                btnNew.classList.add('hidden');
+                scopeBanner.innerHTML = `<i class="fa-solid fa-wrench mr-1"></i> Logged in as <strong>${currentUser.name}</strong>. Showing tasks assigned specifically to you by Workshop Head XYZ.`;
+            }
+        }
+
+        function getVisibleOrders() {
+            if (!currentUser) return [];
+
+            if (currentUser.role === 'staff') {
+                // Staff sees orders created by themselves or in their lab
+                return workOrders.filter(w => w.requesterId === currentUser.id || w.lab === currentUser.lab);
+            } else if (currentUser.role === 'faculty') {
+                // Faculty sees orders assigned to them for approval
+                return workOrders.filter(w => w.facultyId === currentUser.id);
+            } else if (currentUser.role === 'workshop_head') {
+                // Workshop Supervisor sees all orders approved by faculty or in workshop
+                return workOrders.filter(w => w.status !== 'Pending Approval' || w.status === 'Approved - Pending Workshop Assignment');
+            } else if (currentUser.role === 'workshop_staff') {
+                // Workshop Tech sees tasks assigned specifically to them
+                return workOrders.filter(w => w.assignment && w.assignment.assignedTo === currentUser.id);
+            }
+            return workOrders;
+        }
+
+        function renderDashboard() {
+            const visible = getVisibleOrders();
+
+            // KPIs
+            const total = visible.length;
+            const pending = visible.filter(w => w.status === 'Pending Approval').length;
+            const activeWorkshop = visible.filter(w => w.status === 'Approved - Pending Workshop Assignment' || w.status === 'Assigned to Workshop' || w.status === 'In Progress').length;
+            const completed = visible.filter(w => w.status === 'Completed').length;
+
+            document.getElementById('kpiTotal').textContent = total;
+            document.getElementById('kpiPending').textContent = pending;
+            document.getElementById('kpiInProgress').textContent = activeWorkshop;
+            document.getElementById('kpiCompleted').textContent = completed;
+
+            // Satisfaction Score Calculation
+            const ratedList = visible.filter(w => w.feedback && w.feedback.rating);
+            if (ratedList.length > 0) {
+                const totalScore = ratedList.reduce((acc, curr) => acc + (curr.feedback.score || 5), 0);
+                const avg = (totalScore / ratedList.length).toFixed(1);
+                document.getElementById('kpiSatisfactionScore').textContent = `${avg} / 5.0`;
+                document.getElementById('kpiTotalFeedbackCount').textContent = `(${ratedList.length} Ratings)`;
+
+                let stars = '';
+                const rounded = Math.round(parseFloat(avg));
+                for(let i=1; i<=5; i++) {
+                    stars += i <= rounded ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star text-slate-500"></i>';
+                }
+                document.getElementById('kpiAvgRatingStars').innerHTML = stars;
+
+                const hSat = ratedList.filter(w => w.feedback.rating === 'Highly Satisfied').length;
+                const sat = ratedList.filter(w => w.feedback.rating === 'Satisfied').length;
+                const pctH = Math.round((hSat / ratedList.length) * 100);
+                const pctS = Math.round((sat / ratedList.length) * 100);
+
+                document.getElementById('pctHighlySatisfied').textContent = `${pctH}%`;
+                document.getElementById('barHighlySatisfied').style.width = `${pctH}%`;
+                document.getElementById('pctSatisfied').textContent = `${pctS}%`;
+                document.getElementById('barSatisfied').style.width = `${pctS}%`;
+            } else {
+                document.getElementById('kpiSatisfactionScore').textContent = "N/A";
+                document.getElementById('kpiAvgRatingStars').innerHTML = '<span class="text-xs text-slate-400 font-normal">No reviews yet</span>';
+                document.getElementById('kpiTotalFeedbackCount').textContent = "(0 Ratings)";
+                document.getElementById('pctHighlySatisfied').textContent = "0%";
+                document.getElementById('barHighlySatisfied').style.width = "0%";
+                document.getElementById('pctSatisfied').textContent = "0%";
+                document.getElementById('barSatisfied').style.width = "0%";
+            }
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            const status = document.getElementById('statusFilter').value;
+            const priority = document.getElementById('priorityFilter').value;
+
+            const visible = getVisibleOrders();
+
+            const filtered = visible.filter(w => {
+                const matchSearch = w.id.toLowerCase().includes(search) ||
+                                    w.title.toLowerCase().includes(search) ||
+                                    w.requesterId.toLowerCase().includes(search) ||
+                                    w.lab.toLowerCase().includes(search) ||
+                                    (w.assignment && w.assignment.assignedTo.toLowerCase().includes(search));
+                
+                const matchStatus = status === 'ALL' || w.status === status;
+                const matchPriority = priority === 'ALL' || w.priority === priority;
+
+                return matchSearch && matchStatus && matchPriority;
+            });
+
+            document.getElementById('filteredCountBadge').textContent = `Showing ${filtered.length} order${filtered.length!==1?'s':''}`;
+            renderTableRows(filtered);
+        }
+
+        function renderTableRows(list) {
+            const tbody = document.getElementById('workOrderTableBody');
+            const empty = document.getElementById('emptyState');
+
+            if (list.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            let html = '';
+
+            list.forEach(w => {
+                let priorityTag = '';
+                if (w.priority === 'Urgent') priorityTag = `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">🔥 Urgent</span>`;
+                else priorityTag = `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">${w.priority}</span>`;
+
+                let statusBadge = '';
+                switch (w.status) {
+                    case 'Pending Approval':
+                        statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200"><i class="fa-regular fa-clock mr-1"></i>Pending ${w.facultyId}</span>`;
+                        break;
+                    case 'Approved - Pending Workshop Assignment':
+                        statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200"><i class="fa-solid fa-thumbs-up mr-1"></i>Approved by ${w.facultyId}</span>`;
+                        break;
+                    case 'Assigned to Workshop':
+                    case 'In Progress':
+                        statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200"><i class="fa-solid fa-gear fa-spin mr-1"></i>${w.status}</span>`;
+                        break;
+                    case 'Completed':
+                        statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-check mr-1"></i>Completed</span>`;
+                        break;
+                    case 'Rejected':
+                        statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200"><i class="fa-solid fa-ban mr-1"></i>Rejected</span>`;
+                        break;
+                }
+
+                let actionBtn = '';
+                if (currentUser.role === 'faculty' && w.status === 'Pending Approval') {
+                    actionBtn = `<button onclick="openWoDetailsModal('${w.id}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded font-bold shadow-xs">Approve / Reject</button>`;
+                } else if (currentUser.role === 'workshop_head' && w.status === 'Approved - Pending Workshop Assignment') {
+                    actionBtn = `<button onclick="openWoDetailsModal('${w.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded font-bold shadow-xs">Assign Staff</button>`;
+                } else if (currentUser.role === 'workshop_staff' && w.status !== 'Completed') {
+                    actionBtn = `<button onclick="openWoDetailsModal('${w.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded font-bold shadow-xs">Update / Complete</button>`;
+                } else {
+                    actionBtn = `<button onclick="openWoDetailsModal('${w.id}')" class="text-blue-600 hover:underline font-bold">View Order</button>`;
+                }
+
+                html += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4">
+                            <div class="font-extrabold text-slate-900">${w.id}</div>
+                            <div class="text-[10px] text-slate-400">${w.dateCreated}</div>
+                        </td>
+                        <td class="py-3 px-4 max-w-xs">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-slate-800 truncate">${escapeHtml(w.title)}</span>
+                                ${priorityTag}
+                            </div>
+                            <div class="text-[11px] text-slate-500">${escapeHtml(w.category)}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-700">${escapeHtml(w.requesterId)}</div>
+                            <div class="text-[10px] text-slate-400">${escapeHtml(w.lab)}</div>
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">
+                            ${escapeHtml(w.facultyId)}
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">
+                            ${w.assignment ? escapeHtml(w.assignment.assignedTo) : '<span class="text-slate-400 italic">Unassigned</span>'}
+                        </td>
+                        <td class="py-3 px-4">${statusBadge}</td>
+                        <td class="py-3 px-4 text-right">${actionBtn}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function openCreateWoModal() {
+            if (currentUser.role !== 'staff') {
+                showToast("Only Lab Staff members (Staff A-Z) can submit new work orders.");
+                return;
+            }
+            document.getElementById('createWoForm').reset();
+            document.getElementById('createModalSubText').textContent = `Requesting from ${currentUser.name} (${currentUser.lab}) -> Assigned to ${currentUser.reportsTo}`;
+            document.getElementById('materialsContainer').innerHTML = `
+                <div class="flex gap-2 items-center material-row">
+                    <input type="text" placeholder="Item Name" class="mat-item flex-1 px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-600">
+                    <input type="text" placeholder="Qty" class="mat-qty w-32 px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-600">
+                    <button type="button" onclick="removeMaterialRow(this)" class="text-slate-400 hover:text-rose-500 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `;
+            selectedMockFile = "";
+            document.getElementById('selectedFileName').classList.add('hidden');
+            openModal('createWoModal');
+        }
+
+        function addMaterialInputRow() {
+            const container = document.getElementById('materialsContainer');
+            const row = document.createElement('div');
+            row.className = 'flex gap-2 items-center material-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Item Name" class="mat-item flex-1 px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-600">
+                <input type="text" placeholder="Qty" class="mat-qty w-32 px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-600">
+                <button type="button" onclick="removeMaterialRow(this)" class="text-slate-400 hover:text-rose-500 p-1"><i class="fa-solid fa-trash-can"></i></button>
+            `;
+            container.appendChild(row);
+        }
+
+        function removeMaterialRow(btn) {
+            const container = document.getElementById('materialsContainer');
+            if (container.querySelectorAll('.material-row').length > 1) {
+                btn.closest('.material-row').remove();
+            }
+        }
+
+        function handleMockFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedMockFile = file.name;
+                const nameDisplay = document.getElementById('selectedFileName');
+                nameDisplay.textContent = `Attached: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+                nameDisplay.classList.remove('hidden');
+            }
+        }
+
+        function handleCreateWoSubmit(e) {
+            e.preventDefault();
+            const nextSeq = workOrders.length + 1;
+            const newId = `WO-2026-${String(nextSeq).padStart(3, '0')}`;
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            const matRows = document.querySelectorAll('.material-row');
+            const materials = [];
+            matRows.forEach(r => {
+                const item = r.querySelector('.mat-item').value.trim();
+                const qty = r.querySelector('.mat-qty').value.trim();
+                if (item) materials.push({ item, qty: qty || '1 unit' });
+            });
+
+            const newWo = {
+                id: newId,
+                title: document.getElementById('formTitle').value.trim(),
+                category: document.getElementById('formCategory').value,
+                lab: currentUser.lab,
+                requesterId: currentUser.id,
+                facultyId: currentUser.reportsTo, // Auto-assigns to staff's reporting faculty!
+                priority: document.querySelector('input[name="formPriority"]:checked').value,
+                status: "Pending Approval",
+                dateCreated: dateStr,
+                description: document.getElementById('formDescription').value.trim(),
+                materials: materials.length > 0 ? materials : [{ item: "Standard Workshop Materials", qty: "As needed" }],
+                attachments: selectedMockFile ? [{ name: selectedMockFile, size: "1.8 MB" }] : [],
+                facultyApproval: null,
+                assignment: null,
+                completion: null,
+                feedback: null,
+                history: [
+                    { timestamp: dateStr, action: "Submitted", actor: currentUser.name, details: `Created request automatically routed to ${currentUser.reportsTo}.` }
+                ]
+            };
+
+            workOrders.unshift(newWo);
+            saveOrdersToStorage();
+            closeModal('createWoModal');
+            renderDashboard();
+            showToast(`Work Order ${newId} submitted! Sent to ${currentUser.reportsTo} for approval.`);
+        }
+
+        function openWoDetailsModal(woId) {
+            const wo = workOrders.find(w => w.id === woId);
+            if (!wo) return;
+
+            const header = document.getElementById('detailHeaderBar');
+            header.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="text-base font-black px-2.5 py-1 bg-blue-600 rounded text-white">${wo.id}</span>
+                    <div>
+                        <h3 class="font-bold text-sm leading-tight">${escapeHtml(wo.title)}</h3>
+                        <p class="text-[11px] text-slate-400">Submitted by ${wo.requesterId} (${wo.lab}) → Approval: ${wo.facultyId}</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('detailsWoModal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            `;
+
+            const body = document.getElementById('detailBodyContent');
+            let content = '';
+
+            // Overview Cards
+            content += `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Status</p><p class="font-bold text-slate-800">${wo.status}</p></div>
+                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Priority Tag</p><p class="font-bold ${wo.priority==='Urgent'?'text-red-600':'text-blue-600'}">${wo.priority}</p></div>
+                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Category</p><p class="font-bold text-slate-800">${wo.category}</p></div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-slate-600 mb-1">Work Description</h4>
+                    <p class="p-3 bg-white rounded-lg border border-slate-200 leading-relaxed text-slate-800">${escapeHtml(wo.description)}</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-slate-700 mb-2"><i class="fa-solid fa-boxes-stacked text-blue-600 mr-1"></i> Materials</h4>
+                        <ul class="divide-y divide-slate-100">
+                            ${wo.materials.map(m => `<li class="py-1 flex justify-between"><span>${escapeHtml(m.item)}</span><span class="font-mono font-bold bg-slate-100 px-1.5 rounded">${escapeHtml(m.qty)}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-slate-700 mb-2"><i class="fa-solid fa-paperclip text-blue-600 mr-1"></i> Drawing Attachments</h4>
+                        ${wo.attachments && wo.attachments.length > 0 ? `
+                            <ul class="space-y-1">
+                                ${wo.attachments.map(a => `<li class="p-1.5 bg-slate-50 rounded border border-slate-200 flex justify-between"><span class="font-semibold text-blue-600">${escapeHtml(a.name)}</span><span class="text-slate-400 text-[10px]">${a.size}</span></li>`).join('')}
+                            </ul>
+                        ` : '<p class="text-slate-400 italic">No drawing attached.</p>'}
+                    </div>
+                </div>
+            `;
+
+            // Faculty Sign-off info
+            if (wo.facultyApproval) {
+                content += `
+                    <div class="p-3 bg-purple-50 border border-purple-200 rounded-xl">
+                        <div class="flex justify-between font-bold text-purple-900">
+                            <span><i class="fa-solid fa-graduation-cap mr-1"></i> Faculty Sign-off (${wo.facultyApproval.approvedBy})</span>
+                            <span class="text-[10px] text-purple-700">${wo.facultyApproval.date}</span>
+                        </div>
+                        <p class="mt-1 text-purple-800">"${escapeHtml(wo.facultyApproval.comments)}"</p>
+                    </div>
+                `;
+            }
+
+            // Workshop Assignment info
+            if (wo.assignment) {
+                content += `
+                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
+                        <div class="flex justify-between font-bold text-blue-900">
+                            <span><i class="fa-solid fa-gears mr-1"></i> Workshop Assignment</span>
+                            <span class="text-[10px] text-blue-700">${wo.assignment.date}</span>
+                        </div>
+                        <p class="text-slate-700">Assigned Technician: <strong class="text-blue-800">${escapeHtml(wo.assignment.assignedTo)}</strong></p>
+                        <p class="p-2 bg-white rounded border border-blue-200 font-mono text-slate-800">"${escapeHtml(wo.assignment.notes)}"</p>
+                    </div>
+                `;
+            }
+
+            // Completion Notes
+            if (wo.completion) {
+                content += `
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                        <div class="flex justify-between font-bold text-emerald-900">
+                            <span><i class="fa-solid fa-circle-check mr-1"></i> Workshop Completion Notes</span>
+                            <span class="text-[10px] text-emerald-700">${wo.completion.date}</span>
+                        </div>
+                        <p class="mt-1 text-emerald-950 font-medium">${escapeHtml(wo.completion.notes)}</p>
+                    </div>
+                `;
+            }
+
+            // ROLE ACTION PANELS
+            
+            // 1. Faculty Approval Form
+            if (currentUser.role === 'faculty' && currentUser.id === wo.facultyId && wo.status === 'Pending Approval') {
+                content += `
+                    <div class="bg-amber-50 border-2 border-amber-300 p-4 rounded-xl space-y-2">
+                        <h4 class="font-bold text-amber-900 uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-stamp"></i> Faculty Approval Action Required
+                        </h4>
+                        <input type="text" id="facultyCommentInput" placeholder="Enter faculty approval comments..." class="w-full p-2 border border-amber-300 rounded text-xs bg-white">
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="processFacultyDecision('${wo.id}', true)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded">
+                                <i class="fa-solid fa-check mr-1"></i> Approve Request
+                            </button>
+                            <button onclick="processFacultyDecision('${wo.id}', false)" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 rounded">
+                                <i class="fa-solid fa-xmark mr-1"></i> Reject Request
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 2. Workshop Head Assignment Form
+            if (currentUser.role === 'workshop_head' && wo.status === 'Approved - Pending Workshop Assignment') {
+                content += `
+                    <div class="bg-blue-50 border-2 border-blue-300 p-4 rounded-xl space-y-2">
+                        <h4 class="font-bold text-blue-900 uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-user-plus"></i> Assign Workshop Specialist (a to f)
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-0.5">Select Technician *</label>
+                                <select id="assignTechSelect" class="w-full p-2 border border-slate-300 rounded bg-white font-bold">
+                                    <option value="Staff a">Staff a (Machinist Specialist)</option>
+                                    <option value="Staff b">Staff b (Welding Specialist)</option>
+                                    <option value="Staff c">Staff c (3D Print & CNC Tech)</option>
+                                    <option value="Staff d">Staff d (Electrical Technician)</option>
+                                    <option value="Staff e">Staff e (Carpentry Specialist)</option>
+                                    <option value="Staff f">Staff f (General Maintenance)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-0.5">Assignment Notes / Instructions *</label>
+                                <input type="text" id="assignNotesInput" placeholder="Special execution instructions..." class="w-full p-2 border border-slate-300 rounded bg-white">
+                            </div>
+                        </div>
+                        <button onclick="processWorkshopAssignment('${wo.id}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded mt-2">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> Assign Task to Technician
+                        </button>
+                    </div>
+                `;
+            }
+
+            // 3. Workshop Staff Execution/Completion Form
+            if (currentUser.role === 'workshop_staff' && wo.assignment && wo.assignment.assignedTo === currentUser.id && wo.status !== 'Completed') {
+                content += `
+                    <div class="bg-emerald-50 border-2 border-emerald-300 p-4 rounded-xl space-y-2">
+                        <h4 class="font-bold text-emerald-900 uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-wrench"></i> Workshop Execution Updates
+                        </h4>
+                        <textarea id="completionNotesInput" rows="2" placeholder="Enter fabrication summary, quality check, or completion notes..." class="w-full p-2 border border-slate-300 rounded bg-white"></textarea>
+                        <div class="flex gap-2">
+                            <button onclick="processWorkshopProgress('${wo.id}', 'In Progress')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">
+                                Set Status to 'In Progress'
+                            </button>
+                            <button onclick="processWorkshopProgress('${wo.id}', 'Completed')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded">
+                                <i class="fa-solid fa-circle-check mr-1"></i> Mark Completed
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 4. Staff Satisfaction Rating Form
+            if (wo.status === 'Completed') {
+                if (wo.feedback) {
+                    content += `
+                        <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white p-4 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-amber-400 uppercase text-xs"><i class="fa-solid fa-star mr-1"></i> Satisfaction Feedback</span>
+                                <span class="text-[10px] text-slate-300">${wo.feedback.date}</span>
+                            </div>
+                            <p class="text-sm font-bold">${wo.feedback.rating} (${wo.feedback.score}/5)</p>
+                            <p class="text-slate-200 italic">"${escapeHtml(wo.feedback.comments)}"</p>
+                        </div>
+                    `;
+                } else if (currentUser.id === wo.requesterId) {
+                    content += `
+                        <div class="bg-amber-50 border-2 border-amber-300 p-4 rounded-xl space-y-2">
+                            <h4 class="font-bold text-amber-900 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-award"></i> Service Satisfaction Feedback
+                            </h4>
+                            <p class="text-slate-600">Rate the finished workshop request:</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                                <label class="border p-2 rounded bg-white hover:bg-amber-100 cursor-pointer has-[:checked]:bg-amber-200">
+                                    <input type="radio" name="feedbackRating" value="Highly Satisfied" data-score="5" checked class="hidden">
+                                    <div class="font-bold text-xs">😍 Highly Satisfied</div>
+                                </label>
+                                <label class="border p-2 rounded bg-white hover:bg-amber-100 cursor-pointer has-[:checked]:bg-amber-200">
+                                    <input type="radio" name="feedbackRating" value="Satisfied" data-score="4" class="hidden">
+                                    <div class="font-bold text-xs">🙂 Satisfied</div>
+                                </label>
+                                <label class="border p-2 rounded bg-white hover:bg-amber-100 cursor-pointer has-[:checked]:bg-amber-200">
+                                    <input type="radio" name="feedbackRating" value="Neutral" data-score="3" class="hidden">
+                                    <div class="font-bold text-xs">😐 Neutral</div>
+                                </label>
+                                <label class="border p-2 rounded bg-white hover:bg-amber-100 cursor-pointer has-[:checked]:bg-amber-200">
+                                    <input type="radio" name="feedbackRating" value="Dissatisfied" data-score="1" class="hidden">
+                                    <div class="font-bold text-xs">🙁 Dissatisfied</div>
+                                </label>
+                            </div>
+                            <input type="text" id="feedbackCommentInput" placeholder="Brief comments..." class="w-full p-2 border border-slate-300 rounded bg-white">
+                            <button onclick="processFeedbackSubmit('${wo.id}')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded">
+                                Submit Feedback Rating
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            // Audit Log History
+            content += `
+                <div class="border-t border-slate-200 pt-3">
+                    <h4 class="font-bold text-slate-500 uppercase mb-2">Audit Trail Log</h4>
+                    <div class="space-y-2 pl-3 border-l-2 border-slate-200">
+                        ${wo.history.map(h => `
+                            <div>
+                                <div class="flex justify-between font-bold text-slate-800">
+                                    <span>${escapeHtml(h.action)} (By: ${escapeHtml(h.actor)})</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">${h.timestamp}</span>
+                                </div>
+                                <p class="text-slate-500 italic">${escapeHtml(h.details)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            body.innerHTML = content;
+            openModal('detailsWoModal');
+        }
+
+        function processFacultyDecision(woId, isApproved) {
+            const wo = workOrders.find(w => w.id === woId);
+            if (!wo) return;
+
+            const comments = document.getElementById('facultyCommentInput').value.trim() || (isApproved ? "Approved by Faculty" : "Rejected");
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            if (isApproved) {
+                wo.status = "Approved - Pending Workshop Assignment";
+                wo.facultyApproval = { approvedBy: currentUser.id, date: dateStr, comments };
+                wo.history.push({ timestamp: dateStr, action: "Faculty Approved", actor: currentUser.id, details: comments });
+                showToast(`Work Order ${woId} Approved! Transferred to Workshop Supervisor XYZ.`);
+            } else {
+                wo.status = "Rejected";
+                wo.history.push({ timestamp: dateStr, action: "Faculty Rejected", actor: currentUser.id, details: comments });
+                showToast(`Work Order ${woId} Rejected.`);
+            }
+
+            saveOrdersToStorage();
+            closeModal('detailsWoModal');
+            renderDashboard();
+        }
+
+        function processWorkshopAssignment(woId) {
+            const wo = workOrders.find(w => w.id === woId);
+            if (!wo) return;
+
+            const assignedTo = document.getElementById('assignTechSelect').value;
+            const notes = document.getElementById('assignNotesInput').value.trim() || "Assigned by Workshop Supervisor.";
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            wo.status = "Assigned to Workshop";
+            wo.assignment = { assignedBy: currentUser.id, assignedTo, date: dateStr, notes };
+            wo.history.push({ timestamp: dateStr, action: "Assigned to Workshop Specialist", actor: currentUser.id, details: `Assigned to ${assignedTo}. Notes: ${notes}` });
+
+            saveOrdersToStorage();
+            closeModal('detailsWoModal');
+            renderDashboard();
+            showToast(`Task assigned to ${assignedTo}!`);
+        }
+
+        function processWorkshopProgress(woId, newStatus) {
+            const wo = workOrders.find(w => w.id === woId);
+            if (!wo) return;
+
+            const notes = document.getElementById('completionNotesInput').value.trim() || `Status updated to ${newStatus}`;
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            wo.status = newStatus;
+            if (newStatus === 'Completed') {
+                wo.completion = { completedBy: currentUser.id, date: dateStr, notes };
+            }
+
+            wo.history.push({ timestamp: dateStr, action: `Status: ${newStatus}`, actor: currentUser.id, details: notes });
+
+            saveOrdersToStorage();
+            closeModal('detailsWoModal');
+            renderDashboard();
+            showToast(`Work Order marked as ${newStatus}!`);
+        }
+
+        function processFeedbackSubmit(woId) {
+            const wo = workOrders.find(w => w.id === woId);
+            if (!wo) return;
+
+            const checked = document.querySelector('input[name="feedbackRating"]:checked');
+            const rating = checked ? checked.value : 'Satisfied';
+            const score = checked ? parseInt(checked.getAttribute('data-score')) : 4;
+            const comments = document.getElementById('feedbackCommentInput').value.trim() || 'Work completed satisfactorily.';
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            wo.feedback = { rating, score, comments, date: dateStr };
+            wo.history.push({ timestamp: dateStr, action: "Feedback Provided", actor: currentUser.id, details: `Rating: ${rating} (${score}/5). "${comments}"` });
+
+            saveOrdersToStorage();
+            closeModal('detailsWoModal');
+            renderDashboard();
+            showToast("Thank you for your feedback rating!");
+        }
+
+        function renderDirectoryTable() {
+            const tbody = document.getElementById('directoryTableBody');
+            let html = '';
+
+            ALL_USERS.forEach(u => {
+                let badge = '';
+                if (u.role === 'staff') badge = '<span class="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">Lab Staff</span>';
+                else if (u.role === 'faculty') badge = '<span class="bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-bold">Faculty In-Charge</span>';
+                else if (u.role === 'workshop_head') badge = '<span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Workshop Supervisor</span>';
+                else if (u.role === 'workshop_staff') badge = '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">Workshop Staff</span>';
+
+                html += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2 border">${badge}</td>
+                        <td class="p-2 border font-bold text-slate-900">${u.id}</td>
+                        <td class="p-2 border">${u.lab}</td>
+                        <td class="p-2 border font-semibold text-slate-700">${u.reportsTo}</td>
+                        <td class="p-2 border font-mono text-blue-700 font-bold">${u.password}</td>
+                        <td class="p-2 border text-center">
+                            <button onclick="fillPresetAndLogin('${u.id}', '${u.password}')" class="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-bold">
+                                Login
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function fillPresetAndLogin(u, p) {
+            closeModal('directoryModal');
+            fillPreset(u, p);
+            const fakeEvent = { preventDefault: () => {} };
+            handleLoginSubmit(fakeEvent);
+        }
+
+        function downloadCurrentHtml() {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "work_order_portal.html";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast("Downloaded 'work_order_portal.html' directly to your computer!");
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function showToast(msg) {
+            const old = document.getElementById('appToast');
+            if (old) old.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'appToast';
+            toast.className = 'fixed bottom-5 right-5 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 z-50 flex items-center gap-2 animate-bounce';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i><span>${escapeHtml(msg)}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => { if (toast) toast.remove(); }, 3500);
+        }
+    </script>
+</body>
+</html>
